@@ -1,5 +1,8 @@
 <?php
 
+use AmRo045\LaravelHashId\Tests\Models\User;
+use AmRo045\LaravelHashId\Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +14,7 @@
 |
 */
 
-// uses(Tests\TestCase::class)->in('Feature');
+uses(TestCase::class)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
@@ -39,7 +42,12 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function createFakeUser(): User
 {
-    // ..
+    $user = new User;
+    $user->id = fake()->numberBetween(1, 1000);
+    $user->name = fake()->userName();
+    $user->email = fake()->email();
+
+    return $user;
 }
