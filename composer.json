@@ -11,7 +11,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "AmRo045\\Laravelhashid\\": "src/"
+            "AmRo045\\LaravelHashId\\": "src"
         }
     },
     "authors": [
@@ -25,5 +25,12 @@
     },
     "require-dev": {
         "orchestra/testbench": "8.0.1"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AmRo045\\LaravelHashId\\PackageServiceProvider"
+            ]
+        }
     }
 }
