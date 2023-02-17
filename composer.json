@@ -1,0 +1,29 @@
+{
+    "name": "amro045/laravelhashid",
+    "description": "Helps you to have more secure URLs.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "hash",
+        "hashid",
+        "secure-id",
+        "youtube-like-id"
+    ],
+    "autoload": {
+        "psr-4": {
+            "AmRo045\\Laravelhashid\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Amin Rostami",
+            "email": "VirtualEmailBox045@Gmail.Com"
+        }
+    ],
+    "require": {
+        "hashids/hashids": "^5.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "8.0.1"
+    }
+}
