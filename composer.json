@@ -24,13 +24,19 @@
         "hashids/hashids": "^5.0"
     },
     "require-dev": {
-        "orchestra/testbench": "8.0.1"
+        "orchestra/testbench": "8.0.1",
+        "pestphp/pest": "^1.22"
     },
     "extra": {
         "laravel": {
             "providers": [
                 "AmRo045\\LaravelHashId\\PackageServiceProvider"
             ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     }
 }
