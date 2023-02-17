@@ -22,9 +22,11 @@ class ResolveHashId
 
         foreach($route->parameters() as $key => $value) {
             $decodedValue = $this->hashids->decode($value);
-            
+
             if (!$decodedValue)
                 abort(Response::HTTP_NOT_FOUND);
+
+            $decodedValue = is_array($decodedValue) ? current($decodedValue) : $decodedValue;
 
             $route->setParameter($key, $decodedValue);
         }
