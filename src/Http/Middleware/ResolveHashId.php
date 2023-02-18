@@ -20,12 +20,12 @@ class ResolveHashId
     {
         if (static::hasIgnoredParameters($parameters)) {
             $this->decode($request, function ($parameterName) use ($parameters) {
-                $parametersToIgnore = static::getIgnoredParameters($parameters);
+                $parametersToIgnore = static::extractParameters($parameters);
                 return in_array($parameterName, $parametersToIgnore);
             });
         } else if (static::hasOnlyParameters($parameters)) {
             $this->decode($request, function ($parameterName) use ($parameters) {
-                $parametersToDecode = static::getOnlyParameters($parameters);
+                $parametersToDecode = static::extractParameters($parameters);
                 return !in_array($parameterName, $parametersToDecode);
             });
         } else {
@@ -62,16 +62,6 @@ class ResolveHashId
     private static function hasOnlyParameters(string $parameters): bool
     {
         return str_starts_with($parameters, 'only');
-    }
-
-    private static function getIgnoredParameters(string $parameters): array
-    {
-        return static::extractParameters($parameters);
-    }
-
-    private static function getOnlyParameters(string $parameters): array
-    {
-        return static::extractParameters($parameters);
     }
 
     private static function extractParameters(string $parameters): array
