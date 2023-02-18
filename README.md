@@ -106,7 +106,7 @@ You may want to ignore some parameters from decoding. To do so, you can pass `ig
 ```php
 Route::get('/users/{user}/posts/{post}/comments/{comment}', function(User $user, Post $post, Comment $comment) {
     return func_get_args();
-})->middleware('hashid:ignore=post&comments');
+})->middleware('hashid:ignore=post&comment');
 ```
 if you want to decode only specific parameters, you can pass the `only` parameter to `hashid` middleware like this:
 
