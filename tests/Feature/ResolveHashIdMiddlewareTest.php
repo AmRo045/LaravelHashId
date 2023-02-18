@@ -6,13 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-it('can decode the hash id', function() {
+it('can decode the hash id', function () {
     $hashids = new Hashids(salt: str()->password(), minHashLength: 16);
     $userId = fake()->numberBetween(1, 1000);
     $encodedId = $hashids->encode($userId);
 
-    $request = Request::create("/users/$encodedId", 'GET');  
-    $request->setRouteResolver(function() use ($encodedId, $userId) {
+    $request = Request::create("/users/$encodedId", 'GET');
+    $request->setRouteResolver(function () use ($encodedId, $userId) {
         $routeStub = $this->createStub(Route::class);
         $routeStub->expects($this->exactly(1))->method('parameters')->willReturn(['user' => $encodedId]);
         $routeStub->expects($this->exactly(1))->method('setParameter')->with('user', $userId);
@@ -21,18 +21,18 @@ it('can decode the hash id', function() {
     });
 
     $middleware = new ResolveHashId($hashids);
-    $middleware->handle($request, fn() => response(null));
+    $middleware->handle($request, fn () => response(null));
 });
 
-it('can have multiple encoded parameters', function() {
+it('can have multiple encoded parameters', function () {
     $hashids = new Hashids(salt: str()->password(), minHashLength: 16);
     $userId = fake()->numberBetween(1, 1000);
     $postId = fake()->numberBetween(1, 1000);
     $encodedUserId = $hashids->encode($userId);
     $encodedPostId = $hashids->encode($postId);
 
-    $request = Request::create("/users/$encodedUserId/posts/$encodedPostId", 'GET');  
-    $request->setRouteResolver(function() use ($encodedUserId, $encodedPostId, $userId, $postId) {
+    $request = Request::create("/users/$encodedUserId/posts/$encodedPostId", 'GET');
+    $request->setRouteResolver(function () use ($encodedUserId, $encodedPostId, $userId, $postId) {
         $routeStub = $this->createStub(Route::class);
         $routeStub->expects($this->exactly(1))->method('parameters')->willReturn([
             'user' => $encodedUserId,
@@ -47,17 +47,65 @@ it('can have multiple encoded parameters', function() {
     });
 
     $middleware = new ResolveHashId($hashids);
-    $middleware->handle($request, fn() => response(null));
+    $middleware->handle($request, fn () => response(null));
 });
 
-it('throws not found exception when the hash id is invalid', function() {
+it('can ignore parameters', function () {
+    $hashids = new Hashids(salt: str()->password(), minHashLength: 16);
+    $userId = fake()->numberBetween(1, 1000);
+    $postId = fake()->numberBetween(1, 1000);
+    $commentId = fake()->numberBetween(1, 1000);
+    $encodedUserId = $hashids->encode($userId);
+
+    $request = Request::create("/users/$encodedUserId/posts/$postId/comments/$commentId", 'GET');
+    $request->setRouteResolver(function () use ($encodedUserId, $userId, $postId, $commentId) {
+        $routeStub = $this->createStub(Route::class);
+        $routeStub->expects($this->exactly(1))->method('parameters')->willReturn([
+            'user' => $encodedUserId,
+            'post' => $postId,
+            'comment' => $commentId,
+        ]);
+        $routeStub->expects($this->exactly(1))->method('setParameter')->with('user', $userId);
+
+        return $routeStub;
+    });
+
+    $middleware = new ResolveHashId($hashids);
+    $middleware->handle($request, fn () => response(null), "ignore=post&comment");
+});
+
+it('can encode specific parameters', function () {
+    $hashids = new Hashids(salt: str()->password(), minHashLength: 16);
+    $userId = fake()->numberBetween(1, 1000);
+    $postId = fake()->numberBetween(1, 1000);
+    $commentId = fake()->numberBetween(1, 1000);
+    $encodedUserId = $hashids->encode($userId);
+
+    $request = Request::create("/users/$encodedUserId/posts/$postId/comments/$commentId", 'GET');
+    $request->setRouteResolver(function () use ($encodedUserId, $userId, $postId, $commentId) {
+        $routeStub = $this->createStub(Route::class);
+        $routeStub->expects($this->exactly(1))->method('parameters')->willReturn([
+            'user' => $encodedUserId,
+            'post' => $postId,
+            'comment' => $commentId,
+        ]);
+        $routeStub->expects($this->exactly(1))->method('setParameter')->with('user', $userId);
+
+        return $routeStub;
+    });
+
+    $middleware = new ResolveHashId($hashids);
+    $middleware->handle($request, fn () => response(null), "only=user");
+});
+
+it('throws not found exception when the hash id is invalid', function () {
     $hashids = new Hashids(salt: str()->password(), minHashLength: 16);
 
-    $request = Request::create("/users/123", 'GET');  
-    $request->setRouteResolver(function() use ($request) {
+    $request = Request::create("/users/123", 'GET');
+    $request->setRouteResolver(function () use ($request) {
         return (new Route('GET', 'users/{user}', []))->bind($request);
     });
 
     $middleware = new ResolveHashId($hashids);
-    $middleware->handle($request, fn() => response(null));
+    $middleware->handle($request, fn () => response(null));
 })->throws(NotFoundHttpException::class);
